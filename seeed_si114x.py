@@ -1,4 +1,7 @@
+#!/usr/bin/python3
+# -*- coding:utf-8 -*-
 from grove.i2c import Bus
+import logging
 import time
 #Registers,Parameters and commands
 
@@ -173,13 +176,20 @@ SI114X_IRQEN_PS3 = 0x10
 SI114X_ADDR = 0x60
 
 class grove_si114x(object):
-    def __init__(self,address = 0x60):
+    def __init__(self,address = SI114X_ADDR):
         self.bus = Bus()
         self.addr = address
+        self._logger = logging.getLogger('grove_si114x')
         assert self.Begin() , "Please check if the I2C device insert in I2C of Base Hat"
-
+    def __del__(self):
+        self.Reset()
+        self.bus.close()
+    def __exit__(self):
+        self.Reset()
+        self.bus.close()
     #Init the si114x and begin to collect data
     def Begin(self):
+        time.sleep(0.1)
         if self._ReadByte(SI114X_PART_ID) != 0X45:
             return False
         self.Reset()
@@ -198,9 +208,9 @@ class grove_si114x(object):
         self._WriteByte(SI114X_INT_CFG, 0)
         self._WriteByte(SI114X_IRQ_STATUS, 0xFF)
         self._WriteByte(SI114X_COMMAND, SI114X_RESET)
-        time.sleep(0.01)
+        time.sleep(0.1)
         self._WriteByte(SI114X_HW_KEY, 0x17)
-        time.sleep(0.01)  
+        time.sleep(0.1)  
 
     #default init  
     def DeInit(self):
@@ -288,7 +298,7 @@ class grove_si114x(object):
             raise  OSError("Please check if the I2C device insert in I2C of Base Hat")
         return read_data
 
-    # _Write 8 bit data to Reg
+    # Write 8 bit data to Reg
     def _WriteByte(self,Reg,Value):
         try:
             self.bus.write_byte_data(self.addr,Reg,Value)
@@ -305,9 +315,12 @@ class grove_si114x(object):
         return read_data   
 def main():
     SI1145 = grove_si114x()
+    print("Please use Ctrl C to quit")
     while True:
-        print('Visible %04d UV %04d IR%04d' % (SI1145.ReadVisible) % (SI1145.ReadUV) %(SI1145.ReadIR), end='')
+        print('Visible %03d UV %.2f IR %03d' % (SI1145.ReadVisible , SI1145.ReadUV/100 , SI1145.ReadIR),end=" ")
+        print('\r', end='')
         time.sleep(0.5)
+
 if __name__ == "__main__":
     main()     
     
