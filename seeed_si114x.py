@@ -3,6 +3,7 @@
 from grove.i2c import Bus
 import logging
 import time
+import signal
 #Registers,Parameters and commands
 
 # commands
@@ -182,10 +183,12 @@ class grove_si114x(object):
         self._logger = logging.getLogger('grove_si114x')
         assert self.Begin() , "Please check if the I2C device insert in I2C of Base Hat"
     def __del__(self):
-        self.Reset()
+        self._WriteByte(SI114X_COMMAND, SI114X_RESET)
+        time.sleep(0.1)
         self.bus.close()
     def __exit__(self):
-        self.Reset()
+        self._WriteByte(SI114X_COMMAND, SI114X_RESET)
+        time.sleep(0.1)
         self.bus.close()
     #Init the si114x and begin to collect data
     def Begin(self):
@@ -313,6 +316,13 @@ class grove_si114x(object):
             raise OSError("Please check if the I2C device insert in I2C of Base Hat")
         read_data = (block[0] & 0xff) | (block[1] << 8)
         return read_data   
+
+def handler(signum, frame):
+    print("Please use Ctrl C to quit")
+    
+signal.signal(signal.SIGTSTP, handler)
+signal.signal(signal.SIGQUIT, handler)
+
 def main():
     SI1145 = grove_si114x()
     print("Please use Ctrl C to quit")
