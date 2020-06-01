@@ -87,8 +87,6 @@ if __name__  == '__main__':
 
 ## API Reference
 
-## API Reference
-
 - uint16_t ReadVisible(void): return visible light of Ambient.
 
 ```python
