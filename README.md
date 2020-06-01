@@ -1,5 +1,7 @@
 # Seeed_Python_SI114X
 
+![](https://camo.githubusercontent.com/0b16b004205798245778945edb73f36c7e5d7adf/68747470733a2f2f73746174696373332e736565656473747564696f2e636f6d2f696d616765732f70726f647563742f313031303230303839253230312e6a7067)
+
 Grove - Sunlight Sensor (si114x) is a multi-channel digital light sensor, which has the ability to detect UV-light, visible light and infrared light.
 
 This device is based on SI1145, a new sensor from SiLabs. The Si1145 is a low-power, reflectance-based, infrared proximity, UV index and ambient light sensor with I2C digital interface and programmable-event interrupt output. This device offers excellent performance under a wide dynamic range and a variety of light sources including direct sunlight.
@@ -21,7 +23,7 @@ On supported GNU/Linux systems like the Raspberry Pi, you can install the driver
 
 ```
 
-pip3 install seeed-python-mlx90640
+pip3 install seeed-python-si114x
 
 ```
 
@@ -29,14 +31,14 @@ To install system-wide (this may be required in some cases):
 
 ```
 
-sudo pip3 install seeed-python-mlx90640
+sudo pip3 install seeed-python-si114x
 
 ```
 
 if you want to update the driver locally from PyPI. you can use:
 
 ```
-pip3 install --upgrade seeed-python-mlx90640
+pip3 install --upgrade seeed-python-si114x
 ```
 
 ## Usage Notes
@@ -50,60 +52,60 @@ First, Check the corresponding i2c number of the board:
 
 ```
 
-Check if the i2c device works properly， 0x33 is the MLX90640 i2c address.
+Check if the i2c device works properly， 0x60 is the SI114x i2c address.
 ```
 
-pi@raspberrypi:~/Seeed_Python_SGP30 $ i2cdetect -y -r 1
+pi@raspberrypi:~/Seeed_Python_SI114X $ i2cdetect -y -r 1
      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
-00:          -- -- -- -- -- -- -- -- -- -- -- -- --
-10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-30: -- -- -- 33 -- -- -- -- -- -- -- -- -- -- -- --
-40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-70: -- -- -- -- -- -- -- --
+00:          -- 04 -- -- -- -- -- -- -- -- -- -- -- 
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+40: -- -- -- -- -- -- -- -- UU -- -- -- -- -- -- -- 
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+60: 60 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+70: -- -- -- -- -- -- -- --   
 
 ```
 
-## initialize the sersor object:
-
-Initialize the sersor object and config the sersor refresh rate.
+## Usage
 
 ```python
-import seeed_mlx90640
-mlx = seeed_mlx90640.grove_mxl90640()
-mlx.refresh_rate = seeed_mlx90640.RefreshRate.REFRESH_8_HZ  # The fastest for raspberry 4 
-# REFRESH_0_5_HZ = 0b000  # 0.5Hz
-# REFRESH_1_HZ = 0b001  # 1Hz
-# REFRESH_2_HZ = 0b010  # 2Hz
-# REFRESH_4_HZ = 0b011  # 4Hz
-# REFRESH_8_HZ = 0b100  # 8Hz
-# REFRESH_16_HZ = 0b101  # 16Hz
-# REFRESH_32_HZ = 0b110  # 32Hz
-# REFRESH_64_HZ = 0b111  # 64Hz
+import seeed_si114x
+import time
+
+def main():
+    SI1145 = seeed_si114x.grove_si114x()
+    print("Please use Ctrl C to quit")
+    while True:
+        print('Visible %03d UV %.2f IR %03d' % (SI1145.ReadVisible , SI1145.ReadUV/100 , SI1145.ReadIR),end=" ")
+        print('\r', end='')
+        time.sleep(0.5)
+if __name__  == '__main__':
+    main()
 ```
 
-## Reading from the Sensor
+## API Reference
 
-To read from the sensor:
+## API Reference
+
+- uint16_t ReadVisible(void): return visible light of Ambient.
 
 ```python
-     try:
-          frame = [0]*768
-          mlx.getFrame(frame)
-     except ValueError:
-          continue
+    print("Visible %03d" % SI1145.ReadVisible)
 ```
 
-maybe you can add content that below to the config.txt to get the fastest rate recommended for compatibility
+- uint16_t ReadUV(void): return Ultraviolet (UV) Index.
 
-```bash
-dtparam=i2c_arm=on,i2c_arm_baudrate=400000
-```  
+```python
+    print("UV %.2f" % SI1145.ReadUV / 100)
+```
 
-This will give you a framerate of - at most - 8FPS.
+- uint16_t ReadIR(void): return infrared light of Ambient.
 
+```python
+    print("IR %03d" % SI1145.ReadIR)
+```
 ----
 
 This software is written by seeed studio<br>
