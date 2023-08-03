@@ -49,13 +49,14 @@ setup(
     
     entry_points = {
     'console_scripts': [
-        'seeed_si144x = seeed_si114x:main'
+        'seeed_si114x = seeed_si114x:main'
+        'seeed_si115x = seeed_si115x:main'
     ]},
 
     # What does your project relate to?
-    keywords='seeed grove si114x  sensor i2c hardware',
+    keywords='seeed grove si114x si115x sensor i2c hardware',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    py_modules=['seeed_si114x'],
+    py_modules=['seeed_si114x', 'seeed_si115x'],
 )
