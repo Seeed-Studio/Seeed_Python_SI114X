@@ -19,7 +19,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
     name='seeed-python-si114x',
     version="1.0.1",
-    description='Python library for the Grove - Sunlight Sensor (si114x). ',
+    description='Python library for the Grove - Sunlight Sensor (si114x,si115x). ',
     long_description=long_description,
     long_description_content_type='text/markdown',
 
