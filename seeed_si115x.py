@@ -117,11 +117,6 @@ class grove_si115x(object):
         self.WriteParamData(SI115X_PARAM.ADCSENS_1, conf[1])
         self.WriteParamData(SI115X_PARAM.ADCPOST_1, conf[2])
         self.WriteParamData(SI115X_PARAM.MEASCONFIG_1, conf[3])
-        # Configures channel 3
-        self.WriteParamData(SI115X_PARAM.ADCCONFIG_3, conf[0])
-        self.WriteParamData(SI115X_PARAM.ADCSENS_3, conf[1])
-        self.WriteParamData(SI115X_PARAM.ADCPOST_3, conf[2])
-        self.WriteParamData(SI115X_PARAM.MEASCONFIG_3, conf[3])
 
         return True
 
@@ -142,23 +137,26 @@ class grove_si115x(object):
     @property
     def ReadVisible(self):
         self.SendCommand(SI115X_CMD.FORCE)
-        byte_h = 194 - self._ReadByte(SI115X_REG.HOSTOUT_0)
-        byte_l = abs(230 - self._ReadByte(SI115X_REG.HOSTOUT_1))
-        return abs(((byte_h << 8) + byte_l) / 3)
+        byte_h = self._ReadByte(SI115X_REG.HOSTOUT_0)
+        byte_m = self._ReadByte(SI115X_REG.HOSTOUT_1)
+        byte_l = self._ReadByte(SI115X_REG.HOSTOUT_2)
+        return abs((byte_h << 16) + (byte_m << 8) + byte_l)
 
     @property
     def ReadIR(self):
         self.SendCommand(SI115X_CMD.FORCE)
-        byte_h = 194 - self._ReadByte(SI115X_REG.HOSTOUT_0)
-        byte_l = abs(230 - self._ReadByte(SI115X_REG.HOSTOUT_1))
-        return abs(((byte_h << 8) + byte_l))
+        byte_h = self._ReadByte(SI115X_REG.HOSTOUT_0)
+        byte_m = self._ReadByte(SI115X_REG.HOSTOUT_1)
+        byte_l = self._ReadByte(SI115X_REG.HOSTOUT_2)
+        return abs(((byte_h << 16) + (byte_m << 8) + byte_l) / 3)
 
     @property
     def ReadUV(self):
         self.SendCommand(SI115X_CMD.FORCE)
-        byte_h = 194 - self._ReadByte(SI115X_REG.HOSTOUT_0)
-        byte_l = abs(230 - self._ReadByte(SI115X_REG.HOSTOUT_1))
-        return abs(194 - byte_h / 10)
+        byte_h = self._ReadByte(SI115X_REG.HOSTOUT_0)
+        byte_m = self._ReadByte(SI115X_REG.HOSTOUT_1)
+        byte_l = self._ReadByte(SI115X_REG.HOSTOUT_2)
+        return abs(((byte_h << 16) + (byte_m << 8) + byte_l) * 0.04)
 
     def SendCommand(self,Command):
         while True:
