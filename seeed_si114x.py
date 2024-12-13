@@ -229,7 +229,7 @@ class grove_si114x(object):
     #read param data
     def ReadParamData(self,Reg):
         self._WriteByte(SI114X_REG.COMMAND, Reg | SI114X_CMD.QUERY)
-        return self._ReadByte(SI114X_CMD.RD)
+        return self._ReadByte(SI114X_REG.RD)
 
     #writ param data
     def WriteParamData(self,Reg,Value):
